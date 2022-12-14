@@ -1,0 +1,36 @@
+{
+  "name": "engmem",
+  "version": "1.0.0",
+  "author": "Alex Novikov",
+  "license": "MTI",
+  "description": "Memorization of english words",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "make": "electron-forge make"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.0.4",
+    "@electron-forge/maker-deb": "^6.0.4",
+    "electron": "^22.0.0"
+  },
+  "dependencies": {
+    "moment": "^2.29.4",
+    "sqlite3": "^5.1.2"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {
+            "options": {
+              "icon": "images/icon.svg"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

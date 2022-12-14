@@ -1,0 +1,142 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>EngMem</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self'">
+        <link rel="stylesheet" href="styles/fontawesome.css">
+        <link rel="stylesheet" href="styles/bulma.css">
+        <link rel="stylesheet" href="styles/main.css">
+    </head>
+    <body>
+        <section class="hero is-info is-fullheight js-layout">
+            <div class="hero-head">
+                <nav class="navbar">
+                    <div class="container">
+                        <div class="navbar-brand">
+                            <span class="navbar-item">
+                                <img src="images/brain.svg" alt="">
+                            </span>
+                            <span class="navbar-burger js-menu-trigger">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <div class="js-menu-warning navbar-burger-warning has-background-warning is-hidden"></div>
+                            </span>
+                        </div>
+                        <div class="navbar-menu js-menu">
+                            <div class="navbar-end">
+                                <a class="navbar-item is-active js-section-selector" data-section="word" href="#">
+                                    New word
+                                </a>
+                                <a class="navbar-item js-section-selector" data-section="repeat" href="#">
+                                    Repeat words
+                                </a>
+                                <a class="navbar-item js-section-selector" data-section="grammar" href="#">
+                                    Grammar
+                                </a>
+                                <a class="navbar-item js-section-selector" data-section="import" href="#">
+                                    Import
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+            <div class="hero-body">
+                <div class="container has-text-centered">
+                    <section class="js-section js-section-word">
+                        <p class="title">Add new word</p>
+                        <form class="js-form-word">
+                            <div class="field">
+                                <div class="control">
+                                    <input class="input" type="text" name="word" placeholder="Word">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control">
+                                    <input class="input" type="text" name="translate" placeholder="Translate">
+                                </div>
+                            </div>
+                            <div class="field is-grouped">
+                                <div class="control">
+                                    <button class="button is-link" type="submit" disabled>Submit</button>
+                                </div>
+                                <div class="control">
+                                    <button class="button is-link is-light" type="button">Cancel</button>
+                                </div>
+                            </div>
+                        </form>
+                    </section>
+                    <section class="js-section js-section-repeat is-hidden">
+                        <p class="title js-word"></p>
+                        <form class="js-form-repeat">
+                            <input type="hidden" name="id" value="0">
+                            <div class="field has-addons">
+                                <p class="control is-expanded">
+                                    <input class="input" type="text" name="translate" placeholder="Translate">
+                                </p>
+                                <p class="control">
+                                    <button class="button is-link" type="submit" disabled>Translate</button>
+                                </p>
+                            </div>
+                        </form>
+                        <p class="subtitle mt-5 js-translate"></p>
+                    </section>
+                    <section class="js-section js-section-grammar is-hidden">
+                        <p class="title">Grammar</p>
+                    </section>
+                    <section class="js-section js-section-import is-hidden">
+                        <p class="title">Import</p>
+                        <p class="subtitle">
+                            Upload the file to import. All new words will be added.<br>
+                            To download the import file, click the button bellow.
+                        </p>
+                        <article class="message is-link">
+                            <div class="message-header">
+                                <p>Upload file</p>
+                            </div>
+                            <div class="message-body">
+                                <form class="js-form-import">
+                                    <div class="file has-name is-boxed is-justify-content-center">
+                                        <label class="file-label">
+                                            <input class="file-input" type="file" name="import">
+                                            <span class="file-cta">
+                                                <span class="file-icon">
+                                                    <i class="fas fa-upload"></i>
+                                                </span>
+                                                <span class="file-label">
+                                                    Choose a file…
+                                                </span>
+                                            </span>
+                                            <span class="file-name is-hidden"></span>
+                                        </label>
+                                    </div>
+                                    <p class="control mt-5">
+                                        <button class="button is-link" type="submit" disabled>Import</button>
+                                    </p>
+                                </form>
+                            </div>
+                        </article>
+                        <button class="mt-5 button is-success js-export-file" type="button">Get file for import</button>
+                    </section>
+                </div>
+            </div>
+        </section>
+
+        <div class="modal js-modal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title has-text-white"></p>
+                    <button class="delete"></button>
+                </header>
+                <section class="modal-card-body"></section>
+            </div>
+        </div>
+
+        <script src="scripts/main.js"></script>
+    </body>
+</html>
