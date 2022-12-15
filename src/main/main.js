@@ -18,6 +18,8 @@ const iv = 'EAlcOwXwYDFL6Zwa'
 
 const Model = require('./Model.js');
 
+if (require('electron-squirrel-startup')) app.quit()
+
 class App
 {
     constructor()
