@@ -16,6 +16,7 @@
     "electron": "^22.0.0"
   },
   "dependencies": {
+    "electron-squirrel-startup": "^1.0.0",
     "moment": "^2.29.4",
     "sqlite3": "^5.1.2"
   },
