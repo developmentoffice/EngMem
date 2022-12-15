@@ -69,15 +69,14 @@ class Model
     {
         return new Promise((resolve, reject) => {
             try {
-                this.db.prepare(`SELECT id, word, translate,
+                this.db.all(`SELECT id, word, translate,
                     (success - fail) AS n,
                     (julianday('now') - julianday(updated)) AS diff
                     FROM words
                     WHERE n < 3
                     ORDER by updated ASC
                     LIMIT 10
-                `)({
-                }, (err, rows) => {
+                `, (err, rows) => {
                     resolve(rows)
                 })
             } catch (e) {
@@ -89,15 +88,14 @@ class Model
     {
         return new Promise((resolve, reject) => {
             try {
-                this.db.prepare(`SELECT id, word, translate,
+                this.db.all(`SELECT id, word, translate,
                     (success - fail) AS n,
                     (julianday('now') - julianday(updated)) AS diff
                     FROM words
                     WHERE n <= 5 AND diff > 1
                     ORDER by updated ASC
                     LIMIT 10
-                `).all({
-                }, (err, rows) => {
+                `, (err, rows) => {
                     resolve(rows)
                 })
             } catch (e) {
@@ -109,15 +107,14 @@ class Model
     {
         return new Promise((resolve, reject) => {
             try {
-                this.db.prepare(`SELECT id, word, translate,
+                this.db.all(`SELECT id, word, translate,
                     (success - fail) AS n,
                     (julianday('now') - julianday(updated)) AS diff
                     FROM words
                     WHERE n < 10 AND diff > 3
                     ORDER by updated ASC
                     LIMIT 10
-                `).all({
-                }, (err, rows) => {
+                `, (err, rows) => {
                     resolve(rows)
                 })
             } catch (e) {
@@ -129,14 +126,13 @@ class Model
     {
         return new Promise((resolve, reject) => {
             try {
-                this.db.prepare(`SELECT id, word, translate,
+                this.db.all(`SELECT id, word, translate,
                     (success - fail) AS n,
                     (julianday('now') - julianday(updated)) AS diff
                     FROM words
                     ORDER by RANDOM()
                     LIMIT 10
-                `).all({
-                }, (err, rows) => {
+                `, (err, rows) => {
                     resolve(rows)
                 })
             } catch (e) {
@@ -218,8 +214,7 @@ class Model
     repeat()
     {
         return new Promise((resolve, reject) => {
-            this.db.prepare(`SELECT last FROM schedule ORDER by last DESC LIMIT 1`).get({
-            }, async (err, row) => {
+            this.db.get(`SELECT last FROM schedule ORDER by last DESC LIMIT 1`, async (err, row) => {
                 try {
                     if (row) {
                         const last = moment(row.last)
