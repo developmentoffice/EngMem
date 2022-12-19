@@ -7,44 +7,30 @@
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron .",
-    "make": "electron-forge make"
+    "build-linux": "electron-builder --linux",
+    "build-windows": "electron-builder --win"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.4",
-    "@electron-forge/maker-deb": "^6.0.4",
-    "@electron-forge/maker-squirrel": "^6.0.4",
-    "electron": "^22.0.0"
+    "electron": "^22.0.0",
+    "electron-builder": "^23.6.0"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0",
     "moment": "^2.29.4",
     "sqlite3": "^5.1.2"
   },
-  "config": {
-    "forge": {
-      "packagerConfig": {},
-      "makers": [
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {
-            "options": {
-              "icon": "images/icon.svg"
-            }
-          }
-        },
-        {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "options": {
-              "name": "EngMem",
-              "copyright": "Alex Novikov",
-              "setupIcon": "images/icons/256.ico",
-              "iconUrl": "images/icons/256.ico",
-              "loadingGif": "/images/loading.gif"
-            }
-          }
-        }
-      ]
+  "build": {
+    "appId": "com.electron.engmem",
+    "productName": "EngMem",
+    "copyright": "Copyright © 2022 Alex Novikov",
+    "linux": {
+      "target": "deb",
+      "icon": "images/icon.svg",
+      "maintainer": "Alex Novikov",
+      "category": "Education"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "images/icons/256.ico"
     }
   }
 }
