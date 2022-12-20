@@ -190,9 +190,9 @@ class Model
     {
         return new Promise((resolve, reject) => {
             try {
-                this.db.prepare(`SELECT id FROM words WHERE id = $id AND translate = $translate`).get({
+                this.db.prepare(`SELECT id FROM words WHERE id = $id AND translate LIKE $translate`).get({
                     $id: args.id,
-                    $translate: args.translate
+                    $translate: `%${args.translate}%`
                 }, (err, row) => {
                     if (row) {
                         resolve(true)
