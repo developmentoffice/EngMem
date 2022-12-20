@@ -70,7 +70,6 @@ class App
             }
         })
         this.win.removeMenu()
-        // this.win.maximize()
         this.win.on('minimize', event => {
             event.preventDefault()
             this.win.hide()
@@ -79,8 +78,6 @@ class App
         this.win.webContents.once('did-finish-load', () => {
             this.initSchedule()
         })
-
-        // this.win.webContents.openDevTools()
     }
     initEvents()
     {
