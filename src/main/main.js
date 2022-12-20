@@ -70,10 +70,10 @@ class App
             }
         })
         this.win.removeMenu()
-        this.win.on('minimize', event => {
-            event.preventDefault()
-            this.win.hide()
-        })
+        // this.win.on('minimize', event => {
+        //     event.preventDefault()
+        //     this.win.hide()
+        // })
         this.win.loadFile('src/renderer/index.html')
         this.win.webContents.once('did-finish-load', () => {
             this.initSchedule()
