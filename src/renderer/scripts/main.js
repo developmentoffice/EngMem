@@ -7,6 +7,7 @@ class Main
         this.initSectionWord()
         this.initSectionRepeat()
         this.initSectionImport()
+        this.initSectionGrammar()
         this.initModalActions()
         this.initMainEvents()
         this.words = []
@@ -193,6 +194,231 @@ class Main
         exportButton.addEventListener('click', event => {
             window.electron.invoke('export-dump')
         })
+    }
+    initSectionGrammar()
+    {
+        const links = document.querySelectorAll('.js-grammar-link')
+        const contents = document.querySelectorAll('.js-grammar-content')
+
+        const showSection = (className, contents) => {
+            contents.forEach(item => item.classList.add('is-hidden'))
+            const section = document.querySelector(className)
+            if (section) section.classList.remove('is-hidden')
+            return section
+        }
+        const tagClick = (event, links) => {
+            const target = event.target
+            links.forEach(item => item.classList.add('is-light'))
+            target.classList.remove('is-light')
+            const value = target.dataset.value
+            return value
+        }
+        const createTable = ({ columns = 1, head = null, rows = [], type = 'free' } = {}) => {
+            let table = '<div class="columns">'
+            for (let i = 0; i < columns; i++) {
+                let content = '<table class="table">'
+                if (head && head[i]) {
+                    content += '<thead><tr>'
+                    head[i].forEach(el => content += `<th>${el}</th>`)
+                    content += '</tr></thead>'
+                }
+                if (rows[i]) {
+                    if (type === 'verb') {
+                        rows[i].forEach((el, j) => content += `<tr><td>${DICT.pronouns.all[j]}</td><td>${el}</td></tr>`)
+                    } else {
+                        rows[i].forEach(row => {
+                            content += '<tr>'
+                            row.forEach(el => content += `<td>${el}</td>`)
+                            content += '</tr>'
+                        })
+                    }
+                }
+                content += '</table>'
+                table += `<div class="column">${content}</div>`
+            }
+            table += '</div>'
+            return table
+        }
+        const auxiliaryVerbsActions = (container) => {
+            const links = document.querySelectorAll('.js-grammar-link-auxiliary_verbs-time')
+            const linkClick = (event) => {
+                const value = tagClick(event, links)
+                container.innerHTML = createTable({
+                    columns: 3,
+                    head: [
+                        DICT.auxiliaryVerbs.be.head,
+                        DICT.auxiliaryVerbs.do.head,
+                        DICT.auxiliaryVerbs.have.head
+                    ],
+                    rows: [
+                        DICT.auxiliaryVerbs.be[value].map(el => el.toLowerCase()),
+                        DICT.auxiliaryVerbs.do[value].map(el => el.toLowerCase()),
+                        DICT.auxiliaryVerbs.have[value].map(el => el.toLowerCase())
+                    ],
+                    type: 'verb'
+                })
+            }
+            links.forEach(item => item.addEventListener('click', linkClick))
+            links[1].click()
+        }
+        const tensesActions = (container) => {
+            const times = document.querySelectorAll('.js-grammar-link-tenses-time')
+            const tenses = document.querySelectorAll('.js-grammar-link-tenses-tense')
+            const forms = document.querySelectorAll('.js-grammar-link-tenses-form')
+            const description = document.querySelector('.js-grammar-content-form')
+            let time = ''
+            let tense = ''
+            let form = ''
+            let positive = []
+            let negative = []
+            let question = []
+            const linkClick = (event, links) => {
+                const classes = event.target.classList
+                const value = tagClick(event, links)
+                if (classes.contains('js-grammar-link-tenses-time')) time = value
+                if (classes.contains('js-grammar-link-tenses-tense')) tense = value
+                if (classes.contains('js-grammar-link-tenses-form')) form = value
+                if (time.length === 0 || tense.length === 0 || form.length === 0) return
+
+                const word = DICT.tenses.regular
+                let content = ''
+                let rows = []
+                switch (`${time} ${tense}`) {
+                    case 'present simple':
+                        content = 'Constant, regular actions or facts of life.<br>I, We, They, You <strong>infinitive</strong><br>He, She, It <strong>infinitive + s (es)</strong>'
+                        rows = DICT.pronouns.all.map((pronoun, i) => {
+                            if (form === 'positive') return [pronoun, word + (DICT.pronouns.third.singular.indexOf(pronoun) !== -1 ? 's' : ''), '']
+                            else if (form === 'negative') return [pronoun, (DICT.pronouns.third.singular.indexOf(pronoun) !== -1 ? `doesn't (does not)` : `don't (do not)`), word]
+                            else if (form === 'question') return [(DICT.pronouns.third.singular.indexOf(pronoun) !== -1 ? 'Does' : 'Do'), pronoun, word + '?']
+                        })
+                    break
+                    case 'past simple':
+                        content = 'One action in the past.<br>Regular: <strong>infinitive + ed</strong><br>Irregular: <strong>II form</strong>'
+                        rows = DICT.pronouns.all.map((pronoun, i) => {
+                            if (form === 'positive') return [pronoun, word + 'ed', '']
+                            else if (form === 'negative') return [pronoun, `didn't (did not)`, word]
+                            else if (form === 'question') return ['Did', pronoun, word + '?']
+                        })
+                    break
+                    case 'future simple':
+                        content = 'One action in the future.<br>Will + <strong>infinitive</strong>'
+                        rows = DICT.pronouns.all.map((pronoun, i) => {
+                            if (form === 'positive') return [pronoun, `will (${pronoun}'ll)`, word]
+                            else if (form === 'negative') return [pronoun, `won't (will not)`, word]
+                            else if (form === 'question') return ['Will', pronoun, word + '?']
+                        })
+                    break
+                    case 'present continuous':
+                        content = 'Now an action is taking place.<br>I <strong>am + infinitive + ing</strong><br>He, She, It <strong>is + infinitive + ing</strong><br>We, They, You <strong>are + infinitive + ing</strong>'
+                        rows = DICT.pronouns.all.map((pronoun, i) => {
+                            if (form === 'positive') return [pronoun, DICT.auxiliaryVerbs.be.present[i].toLowerCase(), word + 'ing']
+                            else if (form === 'negative') return [pronoun, DICT.auxiliaryVerbs.be.present[i].toLowerCase() + ' not', word + 'ing']
+                            else if (form === 'question') return [DICT.auxiliaryVerbs.be.present[i], pronoun, word + 'ing?']
+                        })
+                    break
+                    case 'past continuous':
+                        content = 'At some point in the past an action is taking place.<br>I, He, She, It <strong>was + infinitive + ing</strong><br>We, They, You <strong>were + infinitive + ing</strong>'
+                        rows = DICT.pronouns.all.map((pronoun, i) => {
+                            if (form === 'positive') return [pronoun, DICT.auxiliaryVerbs.be.past[i].toLowerCase(), word + 'ing']
+                            else if (form === 'negative') return [pronoun, DICT.auxiliaryVerbs.be.past[i].toLowerCase() + ' not', word + 'ing']
+                            else if (form === 'question') return [DICT.auxiliaryVerbs.be.past[i], pronoun, word + 'ing?']
+                        })
+                    break
+                    case 'future continuous':
+                        content = 'At some point in the future an action is taking place.<br><strong>Will + be + infinitive + ing</strong>'
+                        rows = DICT.pronouns.all.map((pronoun, i) => {
+                            if (form === 'positive') return [pronoun, DICT.auxiliaryVerbs.be.future[i].toLowerCase(), word + 'ing']
+                            else if (form === 'negative') return [pronoun, `won't (will not) be`, word + 'ing']
+                            else if (form === 'question') return ['Will', pronoun + ' be', word + 'ing?']
+                        })
+                    break
+                    case 'present perfect':
+                        content = 'To the present moment is the result of some action.<br>Regular: I, We, They, You <strong>have + infinitive + ed</strong>. He, She, It <strong>has + infinitive + ed</strong><br>Irregular: I, We, They, You <strong>have + III form</strong>. He, She, It <strong>has + III form</strong>'
+                        rows = DICT.pronouns.all.map((pronoun, i) => {
+                            if (form === 'positive') return [pronoun, (DICT.pronouns.third.singular.indexOf(pronoun) !== -1 ? 'has' : 'have'), word + 'ed']
+                            else if (form === 'negative') return [pronoun, (DICT.pronouns.third.singular.indexOf(pronoun) !== -1 ? `hasn't (has not)` : `haven't (have not)`), word + 'ed']
+                            else if (form === 'question') return [(DICT.pronouns.third.singular.indexOf(pronoun) !== -1 ? 'Has' : 'Have'), pronoun, word + 'ed?']
+                        })
+                    break
+                    case 'past perfect':
+                        content = 'To the moment in the past is the result of some action.<br>Regular: <strong>had + infinitive + ed</strong><br>Irregular: <strong>had + III form</strong>'
+                        rows = DICT.pronouns.all.map((pronoun, i) => {
+                            if (form === 'positive') return [pronoun, 'had', word + 'ed']
+                            else if (form === 'negative') return [pronoun, `hadn't (had not)`, word + 'ed']
+                            else if (form === 'question') return ['Had', pronoun, word + 'ed?']
+                        })
+                    break
+                    case 'future perfect':
+                        content = 'To the moment in the future is the result of some action.<br>Regular: <strong>will + have + infinitive + ed</strong><br>Irregular: <strong>will + have + III form</strong>'
+                        rows = DICT.pronouns.all.map((pronoun, i) => {
+                            if (form === 'positive') return [pronoun, 'will have', word + 'ed']
+                            else if (form === 'negative') return [pronoun, `won't (will not) have`, word + 'ed']
+                            else if (form === 'question') return ['Will', pronoun + ' have', word + 'ed?']
+                        })
+                    break
+                    case 'present perfectContinuous':
+                        content = 'To date, the action has already taken place or will take place.<br>I, We, They, You <strong>have + been + infinitive + ing</strong><br>He, She, It <strong>has + been + infinitive + ing</strong>'
+                        rows = DICT.pronouns.all.map((pronoun, i) => {
+                            if (form === 'positive') return [pronoun, (DICT.pronouns.third.singular.indexOf(pronoun) !== -1 ? 'has' : 'have') + ' been', word + 'ing']
+                            else if (form === 'negative') return [pronoun, (DICT.pronouns.third.singular.indexOf(pronoun) !== -1 ? `hasn't (has not)` : `haven't (have not)`) + ' been', word + 'ing']
+                            else if (form === 'question') return [(DICT.pronouns.third.singular.indexOf(pronoun) !== -1 ? 'Has' : 'Have'), pronoun + ' been', word + 'ing?']
+                        })
+                    break
+                    case 'past perfectContinuous':
+                        content = 'By the time in the past, the action has already happened or will happen.<br><strong>Had + been + infinitive + ing</strong>'
+                        rows = DICT.pronouns.all.map((pronoun, i) => {
+                            if (form === 'positive') return [pronoun, 'had been', word + 'ing']
+                            else if (form === 'negative') return [pronoun, `hadn't (had not) been`, word + 'ing']
+                            else if (form === 'question') return ['Had', pronoun + ' been', word + 'ing?']
+                        })
+                    break
+                    case 'future perfectContinuous':
+                        content = 'At a point in the future, the action has already taken place or will take place.<br><strong>Will + have + been + infinitive + ing</strong>'
+                        rows = DICT.pronouns.all.map((pronoun, i) => {
+                            if (form === 'positive') return [pronoun, `will (${pronoun}'ll) have been`, word + 'ing']
+                            else if (form === 'negative') return [pronoun, `won't (will not) have been`, word + 'ing']
+                            else if (form === 'question') return ['Will', pronoun + ' have been', word + 'ing?']
+                        })
+                    break
+                }
+                description.innerHTML = content
+                container.innerHTML = createTable({
+                    rows: [
+                        rows
+                    ]
+                })
+            }
+            times.forEach(item => item.addEventListener('click', event => linkClick(event, times)))
+            tenses.forEach(item => item.addEventListener('click', event => linkClick(event, tenses)))
+            forms.forEach(item => item.addEventListener('click', event => linkClick(event, forms)))
+            times[1].click()
+            tenses[0].click()
+            forms[0].click()
+        }
+        const linkClick = (event) => {
+            const value = tagClick(event, links)
+            const section = showSection(`.js-grammar-content-${value}`, contents)
+            const container = section.querySelector('.js-grammar-content-container')
+            switch (value) {
+                case 'auxiliary_verbs':
+                    auxiliaryVerbsActions(container)
+                break
+                case 'irregular_verbs':
+                    container.innerHTML = createTable({
+                        head: [
+                            DICT.irregularVerbs.head
+                        ],
+                        rows: [
+                            DICT.irregularVerbs.verbs
+                        ]
+                    })
+                break
+                case 'tenses':
+                    tensesActions(container)
+                break
+            }
+        }
+        links.forEach(item => item.addEventListener('click', linkClick))
     }
     initModalActions()
     {

@@ -10,3 +10,20 @@
     right: 10px;
     top: 10px;
 }
+.grammar .tags .tag {
+    cursor: pointer;
+}
+.grammar .columns > .column > .table {
+    margin: 0 auto;
+}
+.grammar .columns > .column > .table th {
+    text-align: center;
+}
+.grammar__form {
+    margin-bottom: 20px;
+}
+@media (max-width: 768px) {
+    .grammar .columns > .column > .table {
+        width: 100%;
+    }
+}

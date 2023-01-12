@@ -42,6 +42,12 @@ class App
         this.tray.setToolTip('EngMem')
         const contextMenu = Menu.buildFromTemplate([
             {
+                label: 'Hide',
+                click: () => {
+                    this.win.hide()
+                }
+            },
+            {
                 label: 'Restore',
                 click: () => {
                     this.win.show()
@@ -70,10 +76,6 @@ class App
             }
         })
         this.win.removeMenu()
-        // this.win.on('minimize', event => {
-        //     event.preventDefault()
-        //     this.win.hide()
-        // })
         this.win.loadFile('src/renderer/index.html')
         this.win.webContents.once('did-finish-load', () => {
             this.initSchedule()
@@ -161,7 +163,7 @@ class App
             } catch (e) {
             }
         }
-        const INTERVAL = 60 * 60 * 1000
+        const INTERVAL = 20 * 60 * 1000
         setInterval(loop, INTERVAL)
         loop()
     }

@@ -83,10 +83,46 @@
                                 </p>
                             </div>
                         </form>
-                        <p class="subtitle mt-5 js-translate"></p>
+                        <p class="subtitle mt-5 js-translate"> </p>
                     </section>
-                    <section class="js-section js-section-grammar is-hidden">
+                    <section class="grammar js-section js-section-grammar is-hidden">
                         <p class="title">Grammar</p>
+                        <div class="tags is-justify-content-center">
+                            <span class="tag is-success is-light is-large js-grammar-link" data-value="auxiliary_verbs">Auxiliary verbs</span>
+                            <span class="tag is-success is-light is-large js-grammar-link" data-value="tenses">Tenses</span>
+                            <span class="tag is-success is-light is-large js-grammar-link" data-value="irregular_verbs">Irregular verbs</span>
+                        </div>
+                        <div class="js-grammar-content js-grammar-content-auxiliary_verbs is-hidden">
+                            <div class="tags is-justify-content-center">
+                                <span class="tag is-link is-light is-medium js-grammar-link-auxiliary_verbs-time" data-value="past">Past</span>
+                                <span class="tag is-link is-light is-medium js-grammar-link-auxiliary_verbs-time" data-value="present">Present</span>
+                                <span class="tag is-link is-light is-medium js-grammar-link-auxiliary_verbs-time" data-value="future">Future</span>
+                            </div>
+                            <div class="js-grammar-content-container"></div>
+                        </div>
+                        <div class="js-grammar-content js-grammar-content-irregular_verbs is-hidden">
+                            <div class="js-grammar-content-container"></div>
+                        </div>
+                        <div class="js-grammar-content js-grammar-content-tenses is-hidden">
+                            <div class="tags is-justify-content-center">
+                                <span class="tag is-link is-light is-medium js-grammar-link-tenses-time" data-value="past">Past</span>
+                                <span class="tag is-link is-light is-medium js-grammar-link-tenses-time" data-value="present">Present</span>
+                                <span class="tag is-link is-light is-medium js-grammar-link-tenses-time" data-value="future">Future</span>
+                            </div>
+                            <div class="tags is-justify-content-center">
+                                <span class="tag is-link is-light is-medium js-grammar-link-tenses-tense" data-value="simple">Simple</span>
+                                <span class="tag is-link is-light is-medium js-grammar-link-tenses-tense" data-value="continuous">Continuous</span>
+                                <span class="tag is-link is-light is-medium js-grammar-link-tenses-tense" data-value="perfect">Perfect</span>
+                                <span class="tag is-link is-light is-medium js-grammar-link-tenses-tense" data-value="perfectContinuous">Perfect Continuous</span>
+                            </div>
+                            <div class="tags is-justify-content-center">
+                                <span class="tag is-link is-light is-medium js-grammar-link-tenses-form" data-value="positive">Positive</span>
+                                <span class="tag is-link is-light is-medium js-grammar-link-tenses-form" data-value="negative">Negative</span>
+                                <span class="tag is-link is-light is-medium js-grammar-link-tenses-form" data-value="question">Question</span>
+                            </div>
+                            <div class="grammar__form js-grammar-content-form"></div>
+                            <div class="js-grammar-content-container"></div>
+                        </div>
                     </section>
                     <section class="js-section js-section-import is-hidden">
                         <p class="title">Import</p>
@@ -137,6 +173,7 @@
             </div>
         </div>
 
+        <script src="scripts/dict.js"></script>
         <script src="scripts/main.js"></script>
     </body>
 </html>
