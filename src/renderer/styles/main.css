@@ -22,6 +22,14 @@
 .grammar__form {
     margin-bottom: 20px;
 }
+.control--settings {
+    width: 135px;
+    margin: 0 auto;
+    text-align: left;
+}
+.control--settings > .radio + .radio {
+    margin-left: 0;
+}
 @media (max-width: 768px) {
     .grammar .columns > .column > .table {
         width: 100%;

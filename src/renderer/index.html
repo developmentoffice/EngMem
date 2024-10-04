@@ -40,6 +40,9 @@
                                 <a class="navbar-item js-section-selector" data-section="import" href="#">
                                     Import
                                 </a>
+                                <a class="navbar-item js-section-selector" data-section="settings" href="#">
+                                    Settings
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -80,6 +83,9 @@
                                 </p>
                                 <p class="control">
                                     <button class="button is-link" type="submit" disabled>Translate</button>
+                                </p>
+                                <p class="control">
+                                    <button class="button is-primary" type="button">Skip</button>
                                 </p>
                             </div>
                         </form>
@@ -122,6 +128,26 @@
                             </div>
                             <div class="grammar__form js-grammar-content-form"></div>
                             <div class="js-grammar-content-container"></div>
+                        </div>
+                    </section>
+                    <section class="js-section js-section-settings is-hidden">
+                        <p class="title">Settings</p>
+                        <div class="field">
+                            <label class="label has-text-white">Repeat frequency</label>
+                            <div class="control control--settings">
+                                <label class="radio is-block has-text-white">
+                                    <input type="radio" name="frequency" value="low">
+                                    Low
+                                </label>
+                                <label class="radio is-block has-text-white">
+                                    <input type="radio" name="frequency" value="medium">
+                                    Medium
+                                </label>
+                                <label class="radio is-block has-text-white">
+                                    <input type="radio" name="frequency" value="high">
+                                    High
+                                </label>
+                            </div>
                         </div>
                     </section>
                     <section class="js-section js-section-import is-hidden">

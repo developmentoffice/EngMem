@@ -8,6 +8,7 @@ class Model
     constructor()
     {
         this.db = null
+        this.settings = {}
         const db = app.getPath('userData') + '/engmem.db'
         access(db, constants.F_OK, (err) => {
             if (err) {
@@ -19,29 +20,52 @@ class Model
                 })
             } else {
                 this.db = new sqlite3.Database(db)
+                this.initDB()
             }
         })
     }
     initDB()
     {
-        this.db.prepare(`
-            CREATE TABLE IF NOT EXISTS words (
-                id INTEGER PRIMARY KEY,
-                word TEXT NOT NULL UNIQUE,
-                translate TEXT,
-                created DATETIME,
-                updated DATETIME,
-                success INTEGER DEFAULT 0,
-                fail INTEGER DEFAULT 0
-            )
-        `).run()
-        this.db.prepare(`
-            CREATE TABLE IF NOT EXISTS schedule (
-                id INTEGER PRIMARY KEY,
-                last DATETIME
-            )
-        `).run()
-        this.db.exec(`INSERT INTO schedule (last) VALUES (datetime('now', 'localtime'))`)
+        this.db.serialize(async () => {
+            this.db.prepare(`
+                CREATE TABLE IF NOT EXISTS words (
+                    id INTEGER PRIMARY KEY,
+                    word TEXT NOT NULL UNIQUE,
+                    translate TEXT,
+                    created DATETIME,
+                    updated DATETIME,
+                    success INTEGER DEFAULT 0,
+                    fail INTEGER DEFAULT 0
+                )
+            `).run()
+            this.db.prepare(`
+                CREATE TABLE IF NOT EXISTS schedule (
+                    id INTEGER PRIMARY KEY,
+                    last DATETIME
+                )
+            `).run()
+            this.db.prepare(`
+                CREATE TABLE IF NOT EXISTS settings (
+                    id INTEGER PRIMARY KEY,
+                    key TEXT NOT NULL UNIQUE,
+                    value TEXT NOT NULL
+                )
+            `).run()
+            this.db.prepare(`SELECT count(id) as c FROM schedule`, (err) => null)
+                .get((err, row) => {
+                    if (row && row.c === 0) {
+                        this.db.exec(`INSERT INTO schedule (last) VALUES (datetime('now', 'localtime'))`)
+                    }
+                })
+            this.db.prepare(`SELECT id FROM settings WHERE key = $key`, (err) => null)
+                .get({
+                    $key: 'frequency'
+                }, (err, row) => {
+                    if (!row) {
+                        this.db.exec(`INSERT INTO settings (key, value) VALUES ('frequency', 'medium')`)
+                    }
+                })
+        })
     }
     saveWord(args)
     {
@@ -75,7 +99,7 @@ class Model
                     FROM words
                     WHERE n < 3
                     ORDER by updated ASC
-                    LIMIT 10
+                    LIMIT ${this.settings['limit']}
                 `, (err, rows) => {
                     resolve(rows)
                 })
@@ -92,9 +116,9 @@ class Model
                     (success - fail) AS n,
                     (julianday('now') - julianday(updated)) AS diff
                     FROM words
-                    WHERE n <= 5 AND diff > 1
+                    WHERE n <= 5 AND diff > ${this.settings['priority2']}
                     ORDER by updated ASC
-                    LIMIT 10
+                    LIMIT ${this.settings['limit']}
                 `, (err, rows) => {
                     resolve(rows)
                 })
@@ -111,9 +135,9 @@ class Model
                     (success - fail) AS n,
                     (julianday('now') - julianday(updated)) AS diff
                     FROM words
-                    WHERE n < 10 AND diff > 3
+                    WHERE n < 10 AND diff > ${this.settings['priority3']}
                     ORDER by updated ASC
-                    LIMIT 10
+                    LIMIT ${this.settings['limit']}
                 `, (err, rows) => {
                     resolve(rows)
                 })
@@ -131,7 +155,7 @@ class Model
                     (julianday('now') - julianday(updated)) AS diff
                     FROM words
                     ORDER by RANDOM()
-                    LIMIT 10
+                    LIMIT ${this.settings['limit']}
                 `, (err, rows) => {
                     resolve(rows)
                 })
@@ -221,10 +245,10 @@ class Model
                         const now = moment()
                         const diff = now.diff(last, 'hours')
                         const words = await this.getWords()
-                        if (words.priority === 1 && diff >= 3) {
+                        if (words.priority === 1 && diff >= this.settings['repeat1']) {
                             this.db.prepare(`INSERT INTO schedule (last) VALUES (datetime('now', 'localtime'))`).run()
                             resolve(true)
-                        } else if (words.priority > 1 && words.priority <= 3 && diff >= 24) {
+                        } else if (words.priority > 1 && diff >= this.settings['repeat2']) {
                             this.db.prepare(`INSERT INTO schedule (last) VALUES (datetime('now', 'localtime'))`).run()
                             resolve(true)
                         } else {
@@ -238,6 +262,60 @@ class Model
                     reject()
                 }
             })
+        })
+    }
+    getSettings()
+    {
+        return new Promise((resolve, reject) => {
+            try {
+                this.db.all(`SELECT key, value FROM settings`, (err, rows) => {
+                    let settings = rows.reduce((acc, item) => {
+                        acc[item.key] = item.value
+                        return acc
+                    }, {})
+                    switch (settings.frequency) {
+                        case 'low':
+                            this.settings['limit'] = 10
+                            this.settings['priority2'] = 1
+                            this.settings['priority3'] = 3
+                            this.settings['repeat1'] = 3
+                            this.settings['repeat2'] = 24
+                        break
+                        case 'medium':
+                            this.settings['limit'] = 20
+                            this.settings['priority2'] = 0.8
+                            this.settings['priority3'] = 1.5
+                            this.settings['repeat1'] = 2
+                            this.settings['repeat2'] = 10
+                        break
+                        case 'high':
+                            this.settings['limit'] = 30
+                            this.settings['priority2'] = 0.2
+                            this.settings['priority3'] = 0.7
+                            this.settings['repeat1'] = 1
+                            this.settings['repeat2'] = 3
+                        break
+                    }
+                    resolve(settings)
+                })
+            } catch (e) {
+                reject()
+            }
+        })
+    }
+    setSettings(args)
+    {
+        return new Promise((resolve, reject) => {
+            try {
+                this.db.prepare(`UPDATE settings SET value = $value WHERE $key = $key`).run({
+                    $key: args.key,
+                    $value: args.value
+                })
+                this.getSettings()
+                resolve()
+            } catch(e) {
+                reject()
+            }
         })
     }
     import(file)

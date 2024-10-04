@@ -7,6 +7,7 @@ class Main
         this.initSectionWord()
         this.initSectionRepeat()
         this.initSectionImport()
+        this.initSectionSettings()
         this.initSectionGrammar()
         this.initModalActions()
         this.initMainEvents()
@@ -39,6 +40,10 @@ class Main
                 switch (name) {
                     case 'repeat':
                         this.startRepeat()
+                        const translate = document.querySelector('.js-form-repeat input[name="translate"]')
+                        if (translate) {
+                            translate.focus()
+                        }
                     break
                 }
                 menuTrigger.classList.remove('is-active')
@@ -54,12 +59,12 @@ class Main
         const submit = form.querySelector('button[type="submit"]')
         const cancel = form.querySelector('button[type="button"]')
 
-        const reset = (event) => {
+        const reset = () => {
             word.value = ''
             translate.value = ''
             submit.disabled = true
         }
-        const toggleSubmit = (event) => {
+        const toggleSubmit = () => {
             if (word.value.length > 0 && translate.value.length > 0) submit.disabled = false
             else submit.disabled = true
         }
@@ -88,6 +93,7 @@ class Main
         const translate = form.querySelector('input[name="translate"]')
         const id = form.querySelector('input[name="id"]')
         const submit = form.querySelector('button[type="submit"]')
+        const skipEl = form.querySelector('button[type="button"]')
         const layout = document.querySelector('.js-layout')
 
         const reset = () => {
@@ -95,11 +101,11 @@ class Main
             translateWord.innerHTML = ''
             translate.value = ''
             id.value = '0'
-            layout.classList.remove('is-danger', 'is-success')
+            layout.classList.remove('is-danger', 'is-success', 'is-warning')
             layout.classList.add('is-info')
             submit.disabled = true
         }
-        const toggleSubmit = (event) => {
+        const toggleSubmit = () => {
             if (translate.value.length > 0) submit.disabled = false
             else submit.disabled = true
         }
@@ -114,13 +120,33 @@ class Main
             translateWord.innerHTML = this.words[0].translate
             this.words = this.words.slice(1)
             submit.disabled = true
+            translate.disabled = true
             setTimeout(() => {
                 reset()
                 this.nextWord()
+                translate.disabled = false
+                translate.focus()
             }, 5000)
+        }
+        const skip = () => {
+            layout.classList.remove('is-info')
+            layout.classList.add('is-warning')
+            translateWord.innerHTML = this.words[0].translate
+            this.words = this.words.slice(1)
+            submit.disabled = true
+            skipEl.disabled = true
+            translate.disabled = true
+            setTimeout(() => {
+                reset()
+                this.nextWord()
+                skipEl.disabled = false
+                translate.disabled = false
+                translate.focus()
+            }, 10000)
         }
         translate.addEventListener('keyup', toggleSubmit)
         form.addEventListener('submit', submitMethod)
+        skipEl.addEventListener('click', skip)
 
         reset()
     }
@@ -193,6 +219,24 @@ class Main
         })
         exportButton.addEventListener('click', event => {
             window.electron.invoke('export-dump')
+        })
+    }
+    async initSectionSettings()
+    {
+        const settings = await window.electron.invoke('get-settings')
+        const section = document.querySelector('.js-section-settings')
+        const frequency = section.querySelectorAll('input[name="frequency"]')
+        frequency.forEach(item => {
+            if (item.value === settings.frequency) {
+                item.checked = true
+            }
+            item.addEventListener('change', async (event) => {
+                let value = event.target.value
+                await window.electron.invoke('set-settings', {
+                    key: 'frequency',
+                    value: value
+                })
+            })
         })
     }
     initSectionGrammar()
@@ -428,7 +472,7 @@ class Main
         const head = modal.querySelector('.modal-card-head')
         const modalTitle = modal.querySelector('.modal-card-title')
         const modalBody = modal.querySelector('.modal-card-body')
-        const close = (event) => {
+        const close = () => {
             modal.classList.remove('is-active')
             head.classList.remove('has-background-success', 'has-background-danger')
             modalTitle.innerHTML = ''
@@ -436,12 +480,15 @@ class Main
         }
         background.addEventListener('click', close)
         closeButton.addEventListener('click', close)
+        document.addEventListener('keyup', event => {
+            if (event.key === 'Escape') {
+                close()
+            }
+        })
     }
     openModal(type, title, body)
     {
         const modal = document.querySelector('.js-modal')
-        const background = modal.querySelector('.modal-background')
-        const closeButton = modal.querySelector('button')
         const head = modal.querySelector('.modal-card-head')
         const modalTitle = modal.querySelector('.modal-card-title')
         const modalBody = modal.querySelector('.modal-card-body')

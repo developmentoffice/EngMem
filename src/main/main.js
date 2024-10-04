@@ -108,6 +108,22 @@ class App
                 return false
             }
         })
+        ipcMain.handle('get-settings', async (event) => {
+            try {
+                const settings = await this.model.getSettings()
+                return settings
+            } catch (e) {
+                return {}
+            }
+        })
+        ipcMain.handle('set-settings', async (event, args) => {
+            try {
+                const res = await this.model.setSettings(args)
+                return true
+            } catch (e) {
+                return false
+            }
+        })
         ipcMain.handle('export-dump', (event) => {
             let url = dialog.showSaveDialogSync({
                 defaultPath: `/engmem__${moment().format('DDMMYYYYHHmmss')}.txt`
@@ -163,7 +179,7 @@ class App
             } catch (e) {
             }
         }
-        const INTERVAL = 20 * 60 * 1000
+        const INTERVAL = 10 * 60 * 1000
         setInterval(loop, INTERVAL)
         loop()
     }
