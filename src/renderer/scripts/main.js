@@ -156,7 +156,12 @@ class Main
         if (!current) {
             this.openModal('success', `That's all`, 'The words to repeat are over')
             const wordSection = document.querySelector('.js-section-selector[data-section="word"]')
+            const menuWarning = document.querySelector('.js-menu-warning')
+            const sectionRepeat = document.querySelector('.js-section-selector[data-section="repeat"]')
             wordSection.click()
+            menuWarning.classList.add('is-hidden')
+            sectionRepeat.classList.remove('has-text-warning', 'has-text-weight-bold')
+            window.electron.invoke('end-repeat')
             return
         }
         const form = document.querySelector('.js-form-repeat')
@@ -167,11 +172,7 @@ class Main
     }
     async startRepeat()
     {
-        const menuWarning = document.querySelector('.js-menu-warning')
-        const sectionRepeat = document.querySelector('.js-section-selector[data-section="repeat"]')
         const words = await window.electron.invoke('get-words')
-        menuWarning.classList.add('is-hidden')
-        sectionRepeat.classList.remove('has-text-warning', 'has-text-weight-bold')
         this.words = words
         this.nextWord()
     }
@@ -511,6 +512,9 @@ class Main
         window.electron.on('time-to-repeat', event => {
             menuWarning.classList.remove('is-hidden')
             sectionRepeat.classList.add('has-text-warning', 'has-text-weight-bold')
+        })
+        window.electron.on('open-repeat-section', event => {
+            sectionRepeat.click()
         })
     }
 }

@@ -159,6 +159,14 @@ class App
                 })
             })
         })
+        ipcMain.handle('end-repeat', async (event) => {
+            try {
+                await this.model.updateSchedule()
+                return true
+            } catch (e) {
+                return false
+            }
+        })
     }
     initSchedule()
     {
@@ -166,13 +174,18 @@ class App
             try {
                 const res = await this.model.repeat()
                 if (res) {
-                    new Notification(
+                    const notification = new Notification(
                         {
                             title: 'EngMem',
                             body: 'Time to repeat words!',
                             icon: nativeImage.createFromPath(path.join(__dirname, '../../images/icons/32.png'))
                         }
-                    ).show()
+                    )
+                    notification.on('click', (event, arg) => {
+                        this.win.show()
+                        this.win.webContents.send('open-repeat-section')
+                    })
+                    notification.show()
                     this.tray.setImage(nativeImage.createFromPath(path.join(__dirname, '../../images/icons/16a.png')))
                     this.win.webContents.send('time-to-repeat')
                 }

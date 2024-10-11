@@ -98,7 +98,7 @@ class Model
                     (julianday('now') - julianday(updated)) AS diff
                     FROM words
                     WHERE n < 3
-                    ORDER by updated ASC
+                    ORDER by n ASC, updated ASC
                     LIMIT ${this.settings['limit']}
                 `, (err, rows) => {
                     resolve(rows)
@@ -117,7 +117,7 @@ class Model
                     (julianday('now') - julianday(updated)) AS diff
                     FROM words
                     WHERE n <= 5 AND diff > ${this.settings['priority2']}
-                    ORDER by updated ASC
+                    ORDER by n ASC, updated ASC
                     LIMIT ${this.settings['limit']}
                 `, (err, rows) => {
                     resolve(rows)
@@ -136,7 +136,7 @@ class Model
                     (julianday('now') - julianday(updated)) AS diff
                     FROM words
                     WHERE n < 10 AND diff > ${this.settings['priority3']}
-                    ORDER by updated ASC
+                    ORDER by n ASC, updated ASC
                     LIMIT ${this.settings['limit']}
                 `, (err, rows) => {
                     resolve(rows)
@@ -245,16 +245,11 @@ class Model
                         const now = moment()
                         const diff = now.diff(last, 'hours')
                         const words = await this.getWords()
-                        if (words.priority === 1 && diff >= this.settings['repeat1']) {
-                            this.db.prepare(`INSERT INTO schedule (last) VALUES (datetime('now', 'localtime'))`).run()
-                            resolve(true)
-                        } else if (words.priority > 1 && diff >= this.settings['repeat2']) {
-                            this.db.prepare(`INSERT INTO schedule (last) VALUES (datetime('now', 'localtime'))`).run()
+                        if ((words.priority === 1 && diff >= this.settings['repeat1']) || (wirds.priority > 1 && diff >= this.settings['repeat2'])) {
                             resolve(true)
                         } else {
                             resolve(false)
                         }
-
                     } else {
                         resolve(false)
                     }
@@ -262,6 +257,17 @@ class Model
                     reject()
                 }
             })
+        })
+    }
+    updateSchedule()
+    {
+        return new Promise((resolve, reject) => {
+            try {
+                this.db.prepare(`INSERT INTO schedule (last) VALUES (datetime('now', 'localtime'))`).run()
+                resolve(true)
+            } catch(e) {
+                reject()
+            }
         })
     }
     getSettings()
