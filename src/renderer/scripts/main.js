@@ -12,6 +12,7 @@ class Main
         this.initModalActions()
         this.initMainEvents()
         this.words = []
+        this.isStartRepeat = false
     }
     initMenu()
     {
@@ -111,6 +112,10 @@ class Main
         }
         const submitMethod = async (event) => {
             event.preventDefault()
+            if (!this.isStartRepeat) {
+                this.isStartRepeat = true
+                window.electron.invoke('start-repeat')
+            }
             const res = await window.electron.invoke('check-word', {
                 translate: translate.value.trim().toLowerCase(),
                 id: parseInt(id.value)
@@ -129,6 +134,10 @@ class Main
             }, 5000)
         }
         const skip = () => {
+            if (!this.isStartRepeat) {
+                this.isStartRepeat = true
+                window.electron.invoke('start-repeat')
+            }
             layout.classList.remove('is-info')
             layout.classList.add('is-warning')
             translateWord.innerHTML = this.words[0].translate
@@ -154,6 +163,7 @@ class Main
     {
         const current = this.words[0]
         if (!current) {
+            this.isStartRepeat = false
             this.openModal('success', `That's all`, 'The words to repeat are over')
             const wordSection = document.querySelector('.js-section-selector[data-section="word"]')
             const menuWarning = document.querySelector('.js-menu-warning')
@@ -166,8 +176,10 @@ class Main
         }
         const form = document.querySelector('.js-form-repeat')
         const word = document.querySelector('.js-word')
+        const wordsCount = document.querySelector('.js-words-count')
         const id = form.querySelector('input[name="id"]')
         word.innerHTML = current.word
+        wordsCount.innerHTML = this.words.length
         id.value = current.id
     }
     async startRepeat()

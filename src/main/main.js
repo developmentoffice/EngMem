@@ -24,6 +24,7 @@ class App
     {
         this.win = null
         this.tray = null
+        this.disableNotification = false
         this.model = new Model()
 
         app.whenReady().then(() => {
@@ -159,8 +160,12 @@ class App
                 })
             })
         })
+        ipcMain.handle('start-repeat', async (event) => {
+            this.disableNotification = true
+        })
         ipcMain.handle('end-repeat', async (event) => {
             try {
+                this.disableNotification = false
                 await this.model.updateSchedule()
                 return true
             } catch (e) {
@@ -171,6 +176,9 @@ class App
     initSchedule()
     {
         const loop = async () => {
+            if (this.disableNotification) {
+                return
+            }
             try {
                 const res = await this.model.repeat()
                 if (res) {
