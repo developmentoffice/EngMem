@@ -40,7 +40,9 @@ class Main
                 sel.classList.add('is-active')
                 switch (name) {
                     case 'repeat':
-                        this.startRepeat()
+                        if (!this.isStartRepeat) {
+                            this.startRepeat()
+                        }
                         const translate = document.querySelector('.js-form-repeat input[name="translate"]')
                         if (translate) {
                             translate.focus()
@@ -80,6 +82,8 @@ class Main
             title.textContent = 'Add new word'
             if (isEdit) {
                 sectionRepeat.click()
+                this.words = this.words.slice(1)
+                this.nextWord()
             }
         }
         const toggleSubmit = () => {

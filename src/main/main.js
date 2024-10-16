@@ -93,7 +93,6 @@ class App
             }
         })
         ipcMain.handle('get-words', async (event) => {
-            this.tray.setImage(nativeImage.createFromPath(path.join(__dirname, '../../images/icons/16.png')))
             try {
                 const words = await this.model.getWords()
                 return words.rows
@@ -165,6 +164,7 @@ class App
         })
         ipcMain.handle('end-repeat', async (event) => {
             try {
+                this.tray.setImage(nativeImage.createFromPath(path.join(__dirname, '../../images/icons/16.png')))
                 this.disableNotification = false
                 await this.model.updateSchedule()
                 return true
