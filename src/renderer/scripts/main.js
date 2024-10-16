@@ -146,14 +146,15 @@ class Main
                 this.isStartRepeat = true
                 window.electron.invoke('start-repeat')
             }
-            layout.classList.remove('is-info')
             if (type === 'skip') {
+                layout.classList.remove('is-info')
                 layout.classList.add('is-warning')
             } else {
                 const res = await window.electron.invoke('check-word', {
                     translate: translate.value.trim().toLowerCase(),
                     id: parseInt(id.value)
                 })
+                layout.classList.remove('is-info')
                 layout.classList.add(res ? 'is-success' : 'is-danger')
             }
             translateWord.innerHTML = this.words[0].translate + '<button class="button ml-2 is-small is-link js-word-edit" type="button">Edit <b class="ml-1"></b></button>'
