@@ -65,6 +65,11 @@ class Model
                         this.db.exec(`INSERT INTO settings (key, value) VALUES ('frequency', 'medium')`)
                     }
                 })
+            this.db.prepare(`SELECT part FROM words`, (err) => {
+                if (err) {
+                    this.db.exec(`ALTER TABLE words ADD COLUMN part TEXT`)
+                }
+            })
         })
     }
     saveWord(args)
@@ -75,11 +80,22 @@ class Model
                     $word: args.word
                 }, (err, row) => {
                     if (row) {
-                        resolve(false)
+                        if (args.id !== 0) {
+                            this.db.prepare(`UPDATE words SET word = $word, translate = $translate, part = $part WHERE id = $id`).run({
+                                $word: args.word,
+                                $translate: args.translate,
+                                $part: args.part,
+                                $id: args.id
+                            })
+                            resolve(true)
+                        } else {
+                            resolve(false)
+                        }
                     } else {
-                        this.db.prepare(`INSERT INTO words (word, translate, created, updated) VALUES($word, $translate, datetime('now', 'localtime'), datetime('now', 'localtime'))`).run({
+                        this.db.prepare(`INSERT INTO words (word, translate, part, created, updated) VALUES($word, $translate, $part, datetime('now', 'localtime'), datetime('now', 'localtime'))`).run({
                             $word: args.word,
-                            $translate: args.translate
+                            $translate: args.translate,
+                            $part: args.part
                         })
                         resolve(true)
                     }
@@ -93,7 +109,7 @@ class Model
     {
         return new Promise((resolve, reject) => {
             try {
-                this.db.all(`SELECT id, word, translate,
+                this.db.all(`SELECT id, word, translate, part,
                     (success - fail) AS n,
                     (julianday('now') - julianday(updated)) AS diff
                     FROM words
@@ -112,7 +128,7 @@ class Model
     {
         return new Promise((resolve, reject) => {
             try {
-                this.db.all(`SELECT id, word, translate,
+                this.db.all(`SELECT id, word, translate, part,
                     (success - fail) AS n,
                     (julianday('now') - julianday(updated)) AS diff
                     FROM words
@@ -131,7 +147,7 @@ class Model
     {
         return new Promise((resolve, reject) => {
             try {
-                this.db.all(`SELECT id, word, translate,
+                this.db.all(`SELECT id, word, translate, part,
                     (success - fail) AS n,
                     (julianday('now') - julianday(updated)) AS diff
                     FROM words
@@ -150,7 +166,7 @@ class Model
     {
         return new Promise((resolve, reject) => {
             try {
-                this.db.all(`SELECT id, word, translate,
+                this.db.all(`SELECT id, word, translate, part,
                     (success - fail) AS n,
                     (julianday('now') - julianday(updated)) AS diff
                     FROM words

@@ -52,18 +52,35 @@ class Main
             })
         })
     }
-    initSectionWord()
+    initSectionWord(init = null)
     {
         const form = document.querySelector('.js-form-word')
+        const title = document.querySelector('.js-section-word-title')
         const word = form.querySelector('input[name="word"]')
+        const id = form.querySelector('input[name="id"]')
         const translate = form.querySelector('input[name="translate"]')
+        const part = form.querySelector('select[name="part"]')
         const submit = form.querySelector('button[type="submit"]')
         const cancel = form.querySelector('button[type="button"]')
+        const sectionRepeat = document.querySelector('.js-section-selector[data-section="repeat"]')
 
+        const fill = () => {
+            word.value = (init && init.word ? init.word : '')
+            translate.value = (init && init.translate ? init.translate : '')
+            part.value = (init && init.part ? init.part : '')
+            submit.disabled = (init ? false : true)
+        }
         const reset = () => {
+            let isEdit = (id.value !== '0')
             word.value = ''
             translate.value = ''
+            part.value = ''
             submit.disabled = true
+            id.value = '0'
+            title.textContent = 'Add new word'
+            if (isEdit) {
+                sectionRepeat.click()
+            }
         }
         const toggleSubmit = () => {
             if (word.value.length > 0 && translate.value.length > 0) submit.disabled = false
@@ -73,18 +90,23 @@ class Main
             event.preventDefault()
             const res = await window.electron.invoke('save-word', {
                 word: word.value.trim().toLowerCase(),
-                translate: translate.value.trim().toLowerCase()
+                translate: translate.value.trim().toLowerCase(),
+                part: (part.value ? part.value: null),
+                id: parseInt(id.value)
             })
             reset()
             if (res) this.openModal('success', 'Success', `The word was successfully saved. Now it's available to repeat`)
             else this.openModal('error', 'Error', 'This word is already in the dictionary')
         }
-
-        word.addEventListener('keyup', toggleSubmit)
-        translate.addEventListener('keyup', toggleSubmit)
-        cancel.addEventListener('click', reset)
-        form.addEventListener('submit', submitMethod)
-        reset()
+        if (!init) {
+            word.addEventListener('keyup', toggleSubmit)
+            translate.addEventListener('keyup', toggleSubmit)
+            cancel.addEventListener('click', reset)
+            form.addEventListener('submit', submitMethod)
+            reset()
+        } else {
+            fill()
+        }
     }
     initSectionRepeat()
     {
@@ -94,8 +116,10 @@ class Main
         const translate = form.querySelector('input[name="translate"]')
         const id = form.querySelector('input[name="id"]')
         const submit = form.querySelector('button[type="submit"]')
-        const skipEl = form.querySelector('button[type="button"]')
+        const skipEl = form.querySelector('.js-word-skip')
         const layout = document.querySelector('.js-layout')
+
+        let interval = null
 
         const reset = () => {
             word.innerHTML = ''
@@ -105,57 +129,70 @@ class Main
             layout.classList.remove('is-danger', 'is-success', 'is-warning')
             layout.classList.add('is-info')
             submit.disabled = true
+            skipEl.disabled = false
+            translate.disabled = false
         }
         const toggleSubmit = () => {
             if (translate.value.length > 0) submit.disabled = false
             else submit.disabled = true
         }
-        const submitMethod = async (event) => {
+        const checkWord = async (event, type) => {
             event.preventDefault()
             if (!this.isStartRepeat) {
                 this.isStartRepeat = true
                 window.electron.invoke('start-repeat')
             }
-            const res = await window.electron.invoke('check-word', {
-                translate: translate.value.trim().toLowerCase(),
-                id: parseInt(id.value)
-            })
             layout.classList.remove('is-info')
-            layout.classList.add(res ? 'is-success' : 'is-danger')
-            translateWord.innerHTML = this.words[0].translate
-            this.words = this.words.slice(1)
-            submit.disabled = true
-            translate.disabled = true
-            setTimeout(() => {
-                reset()
-                this.nextWord()
-                translate.disabled = false
-                translate.focus()
-            }, 5000)
-        }
-        const skip = () => {
-            if (!this.isStartRepeat) {
-                this.isStartRepeat = true
-                window.electron.invoke('start-repeat')
+            if (type === 'skip') {
+                layout.classList.add('is-warning')
+            } else {
+                const res = await window.electron.invoke('check-word', {
+                    translate: translate.value.trim().toLowerCase(),
+                    id: parseInt(id.value)
+                })
+                layout.classList.add(res ? 'is-success' : 'is-danger')
             }
-            layout.classList.remove('is-info')
-            layout.classList.add('is-warning')
-            translateWord.innerHTML = this.words[0].translate
-            this.words = this.words.slice(1)
+            translateWord.innerHTML = this.words[0].translate + '<button class="button ml-2 is-small is-link js-word-edit" type="button">Edit <b class="ml-1"></b></button>'
             submit.disabled = true
             skipEl.disabled = true
             translate.disabled = true
-            setTimeout(() => {
-                reset()
-                this.nextWord()
-                skipEl.disabled = false
-                translate.disabled = false
-                translate.focus()
-            }, 10000)
+
+            const editEl = translateWord.querySelector('.js-word-edit')
+            const editElTimer = editEl.querySelector('b')
+            editEl.addEventListener('click', edit)
+            let s = 5
+            if (type === 'skip') {
+                s = 10
+            }
+            editElTimer.textContent = s
+            interval = setInterval(() => {
+                s--
+                editElTimer.textContent = s
+                if (s <= 0) {
+                    clearInterval(interval)
+                    this.words = this.words.slice(1)
+                    reset()
+                    this.nextWord()
+                    translate.focus()
+                }
+            }, 1000)
         }
+        const edit = () => {
+            clearInterval(interval)
+            const wordNav = document.querySelector('.js-section-selector[data-section="word"]')
+            const wordSection = document.querySelector('.js-section-word')
+            const title = wordSection.querySelector('.js-section-word-title')
+            const id = wordSection.querySelector('form input[name="id"]')
+            title.innerText = 'Edit word'
+            id.value = this.words[0].id
+            reset()
+            this.initSectionWord(this.words[0])
+            wordNav.click()
+        }
+
         translate.addEventListener('keyup', toggleSubmit)
-        form.addEventListener('submit', submitMethod)
-        skipEl.addEventListener('click', skip)
+        form.addEventListener('submit', (event) => checkWord(event, 'submit'))
+        skipEl.addEventListener('click', (event) => checkWord(event, 'skip'))
 
         reset()
     }
@@ -178,7 +215,7 @@ class Main
         const word = document.querySelector('.js-word')
         const wordsCount = document.querySelector('.js-words-count')
         const id = form.querySelector('input[name="id"]')
-        word.innerHTML = current.word
+        word.innerHTML = current.word + (current.part ? ' <span class="tag is-link">' + current.part + '</span>' : '')
         wordsCount.innerHTML = this.words.length
         id.value = current.id
     }
@@ -523,7 +560,7 @@ class Main
         const sectionRepeat = document.querySelector('.js-section-selector[data-section="repeat"]')
         window.electron.on('time-to-repeat', event => {
             menuWarning.classList.remove('is-hidden')
-            sectionRepeat.classList.add('has-text-warning', 'has-text-weight-bold')
+            sectionRepeat.classList.add('has-text-black', 'has-text-weight-bold')
         })
         window.electron.on('open-repeat-section', event => {
             sectionRepeat.click()

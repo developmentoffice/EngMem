@@ -51,8 +51,9 @@
             <div class="hero-body">
                 <div class="container has-text-centered">
                     <section class="js-section js-section-word">
-                        <p class="title">Add new word</p>
+                        <p class="title js-section-word-title">Add new word</p>
                         <form class="js-form-word">
+                            <input type="hidden" name="id" value="0">
                             <div class="field">
                                 <div class="control">
                                     <input class="input" type="text" name="word" placeholder="Word">
@@ -61,6 +62,19 @@
                             <div class="field">
                                 <div class="control">
                                     <input class="input" type="text" name="translate" placeholder="Translate">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control">
+                                    <div class="select is-fullwidth">
+                                        <select name="part">
+                                            <option value="">Select part of speech</option>
+                                            <option value="noun">noun</option>
+                                            <option value="verb">verb</option>
+                                            <option value="adjective">adjective</option>
+                                            <option value="adverb">adverb</option>
+                                        </select>
+                                      </div>
                                 </div>
                             </div>
                             <div class="field is-grouped">
@@ -86,7 +100,7 @@
                                     <button class="button is-link" type="submit" disabled>Translate</button>
                                 </p>
                                 <p class="control">
-                                    <button class="button is-primary" type="button">Skip</button>
+                                    <button class="button is-primary js-word-skip" type="button">Skip</button>
                                 </p>
                             </div>
                         </form>
