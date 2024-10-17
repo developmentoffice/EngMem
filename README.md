@@ -6,8 +6,8 @@ Application for memorizing and repeating english words
 Link: [https://github.com/developmentoffice/EngMem/releases/download/1.2.2/engmem_1.2.2_amd64.deb](https://github.com/developmentoffice/EngMem/releases/download/1.2.2/engmem_1.2.2_amd64.deb)
 
 ```bash
-wget https://github.com/developmentoffice/EngMem/releases/download/1.2/engmem-1.2.0-amd64.deb
-sudo dpkg -i engmem-1.2.0-amd64.deb
+wget https://github.com/developmentoffice/EngMem/releases/download/1.2.2/engmem-1.2.2-amd64.deb
+sudo dpkg -i engmem-1.2.2-amd64.deb
 engmem
 ```
 
