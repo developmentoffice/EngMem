@@ -13,6 +13,7 @@ class Main
         this.initMainEvents()
         this.words = []
         this.isStartRepeat = false
+        this.modalCallback = null
     }
     initMenu()
     {
@@ -98,9 +99,17 @@ class Main
                 part: (part.value ? part.value: null),
                 id: parseInt(id.value)
             })
-            reset()
-            if (res) this.openModal('success', 'Success', `The word was successfully saved. Now it's available to repeat`)
-            else this.openModal('error', 'Error', 'This word is already in the dictionary')
+            if (res) {
+                this.openModal(
+                    'success',
+                    'Success',
+                    `The word was successfully saved${id.value === '0' ? '. Now it\'s available to repeat' : ''}`,
+                    reset
+                )
+            } else {
+                this.openModal('error', 'Error', 'This word is already in the dictionary')
+                reset()
+            }
         }
         if (!init) {
             word.addEventListener('keyup', toggleSubmit)
@@ -532,6 +541,10 @@ class Main
             head.classList.remove('has-background-success', 'has-background-danger')
             modalTitle.innerHTML = ''
             modalBody.innerHTML = ''
+            if (this.modalCallback) {
+                this.modalCallback()
+                this.modalCallback = null
+            }
         }
         background.addEventListener('click', close)
         closeButton.addEventListener('click', close)
@@ -541,12 +554,13 @@ class Main
             }
         })
     }
-    openModal(type, title, body)
+    openModal(type, title, body, cb = null)
     {
         const modal = document.querySelector('.js-modal')
         const head = modal.querySelector('.modal-card-head')
         const modalTitle = modal.querySelector('.modal-card-title')
         const modalBody = modal.querySelector('.modal-card-body')
+        if (cb) this.modalCallback = cb
         modalTitle.innerHTML = title
         modalBody.innerHTML = body
         switch (type) {
