@@ -91,8 +91,8 @@ class Main
             if (word.value.length > 0 && translate.value.length > 0) submit.disabled = false
             else submit.disabled = true
         }
-        const submitMethod = async (event) => {
-            event.preventDefault()
+        const submitMethod = async () => {
+            if (submit.disabled) return
             const res = await window.electron.invoke('save-word', {
                 word: word.value.trim().toLowerCase(),
                 translate: translate.value.trim().toLowerCase(),
@@ -115,7 +115,16 @@ class Main
             word.addEventListener('keyup', toggleSubmit)
             translate.addEventListener('keyup', toggleSubmit)
             cancel.addEventListener('click', reset)
-            form.addEventListener('submit', submitMethod)
+            form.addEventListener('submit', (event) => {
+                event.preventDefault()
+                submitMethod()
+            })
+            part.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault()
+                    submitMethod()
+                }
+            })
             reset()
         } else {
             fill()
