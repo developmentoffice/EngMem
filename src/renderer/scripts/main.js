@@ -238,7 +238,11 @@ class Main
         const word = document.querySelector('.js-word')
         const wordsCount = document.querySelector('.js-words-count')
         const id = form.querySelector('input[name="id"]')
-        word.innerHTML = current.word + (current.part ? ' <span class="tag is-link">' + current.part + '</span>' : '')
+        let color = 'has-text-black-bis'
+        if (current.n < 3) color = 'has-text-black-ter'
+        else if (current.n <= 0) color = 'has-text-grey-darker'
+        else if (current.n < -1) color = 'has-text-grey-dark'
+        word.innerHTML = '<span class="' + color + '">' + current.word + (current.part ? ' <span class="tag is-link">' + current.part + '</span>' : '') + '</span>'
         wordsCount.innerHTML = this.words.length
         id.value = current.id
     }
