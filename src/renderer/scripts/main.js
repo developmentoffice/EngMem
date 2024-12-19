@@ -238,11 +238,23 @@ class Main
         const word = document.querySelector('.js-word')
         const wordsCount = document.querySelector('.js-words-count')
         const id = form.querySelector('input[name="id"]')
-        let color = 'has-text-black-bis'
-        if (current.n < 3) color = 'has-text-black-ter'
-        else if (current.n <= 0) color = 'has-text-grey-darker'
-        else if (current.n < -1) color = 'has-text-grey-dark'
-        word.innerHTML = '<span class="' + color + '">' + current.word + (current.part ? ' <span class="tag is-link">' + current.part + '</span>' : '') + '</span>'
+
+        let repeatStatus = ''
+        let repeatStatistics = ''
+        if (current.n < -1) repeatStatus = 'is-danger'
+        else if (current.n < 1) repeatStatus = 'is-warning'
+        else repeatStatus = 'is-info'
+        if (current.success === 0 && current.fail === 0) {
+            repeatStatistics = 'new'
+            repeatStatus = 'is-success'
+        } else {
+            repeatStatistics = `${current.success} / ${current.fail}`
+        }
+        word.innerHTML = `<span>
+            ${current.word}
+            ${current.part ? `<span class="tag is-link">${current.part}</span>` : ''}
+            <span class="tag ${repeatStatus}">${repeatStatistics}</span>
+        </span>`
         wordsCount.innerHTML = this.words.length
         id.value = current.id
     }

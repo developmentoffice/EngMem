@@ -109,7 +109,7 @@ class Model
     {
         return new Promise((resolve, reject) => {
             try {
-                this.db.all(`SELECT id, word, translate, part,
+                this.db.all(`SELECT id, word, translate, part, success, fail,
                     (success - fail) AS n,
                     (julianday('now') - julianday(updated)) AS diff
                     FROM words
@@ -128,7 +128,7 @@ class Model
     {
         return new Promise((resolve, reject) => {
             try {
-                this.db.all(`SELECT id, word, translate, part,
+                this.db.all(`SELECT id, word, translate, part, success, fail,
                     (success - fail) AS n,
                     (julianday('now') - julianday(updated)) AS diff
                     FROM words
@@ -147,7 +147,7 @@ class Model
     {
         return new Promise((resolve, reject) => {
             try {
-                this.db.all(`SELECT id, word, translate, part,
+                this.db.all(`SELECT id, word, translate, part, success, fail,
                     (success - fail) AS n,
                     (julianday('now') - julianday(updated)) AS diff
                     FROM words
@@ -166,7 +166,7 @@ class Model
     {
         return new Promise((resolve, reject) => {
             try {
-                this.db.all(`SELECT id, word, translate, part,
+                this.db.all(`SELECT id, word, translate, part, success, fail,
                     (success - fail) AS n,
                     (julianday('now') - julianday(updated)) AS diff
                     FROM words
