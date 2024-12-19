@@ -243,7 +243,7 @@ class Main
         let repeatStatistics = ''
         if (current.n < -1) repeatStatus = 'is-danger'
         else if (current.n < 1) repeatStatus = 'is-warning'
-        else repeatStatus = 'is-info'
+        else repeatStatus = 'is-dark'
         if (current.success === 0 && current.fail === 0) {
             repeatStatistics = 'new'
             repeatStatus = 'is-success'
