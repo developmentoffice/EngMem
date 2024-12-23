@@ -237,6 +237,7 @@ class Main
         }
         const form = document.querySelector('.js-form-repeat')
         const word = document.querySelector('.js-word')
+        const date = document.querySelector('.js-word-date')
         const wordsCount = document.querySelector('.js-words-count')
         const id = form.querySelector('input[name="id"]')
         const rating = document.querySelector('.js-rating')
@@ -259,6 +260,7 @@ class Main
             ${current.part ? `<span class="tag is-link">${current.part}</span>` : ''}
             <span class="tag ${repeatStatus}">${repeatStatistics}</span>
         </span>`
+        date.innerText = `Last repeat: ${current.updated ? this.formatDate(current.updated) : 'never'}`
         wordsCount.innerHTML = this.words.length
         id.value = current.id
         this.currentWord++
@@ -621,6 +623,17 @@ class Main
         window.electron.on('open-repeat-section', event => {
             sectionRepeat.click()
         })
+    }
+    formatDate(date)
+    {
+        const dateObject = new Date(date);
+
+        return `0${dateObject.getDate().toString()}`.slice(-2) + '.' +
+        `0${(dateObject.getMonth() + 1).toString()}`.slice(-2) + '.' +
+        dateObject.getFullYear().toString() + ' ' +
+        `0${dateObject.getHours().toString()}`.slice(-2) + ':' +
+        `0${dateObject.getMinutes().toString()}`.slice(-2) + ':' +
+        `0${dateObject.getSeconds().toString()}`.slice(-2)
     }
 }
 

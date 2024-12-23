@@ -111,7 +111,8 @@ class Model
             try {
                 this.db.all(`SELECT id, word, translate, part, success, fail,
                     (success - fail) AS n,
-                    (julianday('now') - julianday(updated)) AS diff
+                    (julianday('now') - julianday(updated)) AS diff,
+                    updated
                     FROM words
                     WHERE n < 3
                     ORDER by n ASC, updated ASC
@@ -130,7 +131,8 @@ class Model
             try {
                 this.db.all(`SELECT id, word, translate, part, success, fail,
                     (success - fail) AS n,
-                    (julianday('now') - julianday(updated)) AS diff
+                    (julianday('now') - julianday(updated)) AS diff,
+                    updated
                     FROM words
                     WHERE n <= 5 AND diff > ${this.settings['priority2']}
                     ORDER by n ASC, updated ASC
@@ -149,7 +151,8 @@ class Model
             try {
                 this.db.all(`SELECT id, word, translate, part, success, fail,
                     (success - fail) AS n,
-                    (julianday('now') - julianday(updated)) AS diff
+                    (julianday('now') - julianday(updated)) AS diff,
+                    updated
                     FROM words
                     WHERE n < 10 AND diff > ${this.settings['priority3']}
                     ORDER by n ASC, updated ASC
@@ -168,7 +171,8 @@ class Model
             try {
                 this.db.all(`SELECT id, word, translate, part, success, fail,
                     (success - fail) AS n,
-                    (julianday('now') - julianday(updated)) AS diff
+                    (julianday('now') - julianday(updated)) AS diff,
+                    updated
                     FROM words
                     ORDER by RANDOM()
                     LIMIT ${this.settings['limit']}
