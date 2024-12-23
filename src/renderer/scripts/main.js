@@ -12,6 +12,7 @@ class Main
         this.initModalActions()
         this.initMainEvents()
         this.words = []
+        this.currentWord = 0
         this.isStartRepeat = false
         this.modalCallback = null
     }
@@ -238,6 +239,9 @@ class Main
         const word = document.querySelector('.js-word')
         const wordsCount = document.querySelector('.js-words-count')
         const id = form.querySelector('input[name="id"]')
+        const rating = document.querySelector('.js-rating')
+
+        rating.querySelector('li:nth-child(' + (this.currentWord + 1) + ') > a').classList.add('has-text-weight-bold', 'has-text-dark')
 
         let repeatStatus = ''
         let repeatStatistics = ''
@@ -257,11 +261,19 @@ class Main
         </span>`
         wordsCount.innerHTML = this.words.length
         id.value = current.id
+        this.currentWord++
     }
     async startRepeat()
     {
         const words = await window.electron.invoke('get-words')
         this.words = words
+        this.currentWord = 0
+        const rating = document.querySelector('.js-rating')
+        let str = '<ul>'
+        str += words.map(el => `<li class="is-active"><a href="#">${el.n}</a></li>`).join('')
+        str += '</ul>'
+        rating.innerHTML = str
+        rating.querySelector('li:nth-child(1) > a').classList.add('has-text-weight-bold', 'has-text-dark')
         this.nextWord()
     }
     initSectionImport()
