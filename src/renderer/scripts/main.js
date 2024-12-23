@@ -217,6 +217,11 @@ class Main
         translate.addEventListener('keyup', toggleSubmit)
         form.addEventListener('submit', (event) => checkWord(event, 'submit'))
         skipEl.addEventListener('click', (event) => checkWord(event, 'skip'))
+        translate.addEventListener('keyup', (event) => {
+            if (event.key === 'Escape') {
+                skipEl.click()
+            }
+        })
 
         reset()
     }
